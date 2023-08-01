@@ -24,6 +24,7 @@ class MainTut {
 List<MainTut> mainList = [
   MainTut(image: "assets/images/basic.png", name: "Basics", subList: basics),
   MainTut(image: "assets/images/advance.png", name: "Advance", subList: advance),
+  MainTut(image: "assets/images/advance.png", name: "Packages", subList: packages),
 ];
 
 class CatalogData {
@@ -48,6 +49,14 @@ List<CatalogData> advance = [
   CatalogData(name: "Multimedia", svg: "assets/svgs/multimedia.svg",subListOfCat: multimediaList),
   CatalogData(name: "Plugins", svg: "assets/svgs/future.svg",subListOfCat: pluginsList),
   CatalogData(name: "Networking", svg: "assets/svgs/networking.svg",subListOfCat: networkingList),
+  CatalogData(name: "Packages", svg: "assets/svgs/networking.svg",subListOfCat: networkingList),
+];
+List<CatalogData> packages = [
+  CatalogData(name: "Animation", svg: "assets/svgs/animated.svg", subListOfCat: advAnimationList),
+  CatalogData(name: "Multimedia", svg: "assets/svgs/multimedia.svg",subListOfCat: multimediaList),
+  CatalogData(name: "Plugins", svg: "assets/svgs/future.svg",subListOfCat: pluginsList),
+  CatalogData(name: "Networking", svg: "assets/svgs/networking.svg",subListOfCat: networkingList),
+  CatalogData(name: "Packages", svg: "assets/svgs/networking.svg",subListOfCat: networkingList),
 ];
 
 class ListOfItems {

@@ -1,11 +1,1116 @@
-
+import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
-import 'package:flutter/material.dart';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:extended_image/extended_image.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:hidden_drawer_menu/controllers/simple_hidden_drawer_controller.dart';
+import 'package:hidden_drawer_menu/simple_hidden_drawer/simple_hidden_drawer.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 
 
+
+class FlutterSpeedDial extends StatefulWidget {
+  // final ValueNotifier<ThemeMode> theme;
+  const FlutterSpeedDial({Key? key,}) : super(key: key);
+  @override
+  _FlutterSpeedDialState createState() => _FlutterSpeedDialState();
+}
+
+class _FlutterSpeedDialState extends State<FlutterSpeedDial> with TickerProviderStateMixin {
+  var renderOverlay = true;
+  var visible = true;
+  var switchLabelPosition = false;
+  var extend = false;
+  var mini = false;
+  var rmicons = false;
+  var customDialRoot = false;
+  var closeManually = false;
+  var useRAnimation = true;
+  var isDialOpen = ValueNotifier<bool>(false);
+  var speedDialDirection = SpeedDialDirection.up;
+  var buttonSize = const Size(56.0, 56.0);
+  var childrenButtonSize = const Size(56.0, 56.0);
+  var selectedfABLocation = FloatingActionButtonLocation.endDocked;
+  var items = [
+    FloatingActionButtonLocation.startFloat,
+    FloatingActionButtonLocation.startDocked,
+    FloatingActionButtonLocation.centerFloat,
+    FloatingActionButtonLocation.endFloat,
+    FloatingActionButtonLocation.endDocked,
+    FloatingActionButtonLocation.startTop,
+    FloatingActionButtonLocation.centerTop,
+    FloatingActionButtonLocation.endTop,
+  ];
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        if (isDialOpen.value) {
+          isDialOpen.value = false;
+          return false;
+        }
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Flutter Speed Dial Example"),
+        ),
+        body: Center(child: Text("Flutter speed dial example")),
+        floatingActionButtonLocation: selectedfABLocation,
+        floatingActionButton: SpeedDial(
+          // animatedIcon: AnimatedIcons.menu_close,
+          // animatedIconTheme: IconThemeData(size: 22.0),
+          // / This is ignored if animatedIcon is non null
+          // child: Text("open"),
+          // activeChild: Text("close"),
+          icon: Icons.add,
+          activeIcon: Icons.close,
+          spacing: 3,
+          mini: mini,
+          openCloseDial: isDialOpen,
+          childPadding: const EdgeInsets.all(5),
+          spaceBetweenChildren: 4,
+          dialRoot: customDialRoot
+              ? (ctx, open, toggleChildren) {
+            return ElevatedButton(
+              onPressed: toggleChildren,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue[900],
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 22, vertical: 18),
+              ),
+              child: const Text(
+                "Custom Dial Root",
+                style: TextStyle(fontSize: 17),
+              ),
+            );
+          }
+              : null,
+          buttonSize:
+          buttonSize, // it's the SpeedDial size which defaults to 56 itself
+          // iconTheme: IconThemeData(size: 22),
+          label: extend
+              ? const Text("Open")
+              : null, // The label of the main button.
+          /// The active label of the main button, Defaults to label if not specified.
+          activeLabel: extend ? const Text("Close") : null,
+
+          /// Transition Builder between label and activeLabel, defaults to FadeTransition.
+          // labelTransitionBuilder: (widget, animation) => ScaleTransition(scale: animation,child: widget),
+          /// The below button size defaults to 56 itself, its the SpeedDial childrens size
+          childrenButtonSize: childrenButtonSize,
+          visible: visible,
+          direction: speedDialDirection,
+          switchLabelPosition: switchLabelPosition,
+
+          /// If true user is forced to close dial manually
+          closeManually: closeManually,
+
+          /// If false, backgroundOverlay will not be rendered.
+          renderOverlay: renderOverlay,
+          // overlayColor: Colors.black,
+          // overlayOpacity: 0.5,
+          onOpen: () => debugPrint('OPENING DIAL'),
+          onClose: () => debugPrint('DIAL CLOSED'),
+          useRotationAnimation: useRAnimation,
+          tooltip: 'Open Speed Dial',
+          heroTag: 'speed-dial-hero-tag',
+          // foregroundColor: Colors.black,
+          // backgroundColor: Colors.white,
+          // activeForegroundColor: Colors.red,
+          // activeBackgroundColor: Colors.blue,
+          elevation: 8.0,
+          animationCurve: Curves.elasticInOut,
+          isOpenOnStart: false,
+          shape: customDialRoot
+              ? const RoundedRectangleBorder()
+              : const StadiumBorder(),
+          // childMargin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          children: [
+            SpeedDialChild(
+              child: !rmicons ? const Icon(Icons.accessibility) : null,
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              label: 'First',
+              onTap: () => setState(() => rmicons = !rmicons),
+              onLongPress: () => debugPrint('FIRST CHILD LONG PRESS'),
+            ),
+            SpeedDialChild(
+              child: !rmicons ? const Icon(Icons.brush) : null,
+              backgroundColor: Colors.deepOrange,
+              foregroundColor: Colors.white,
+              label: 'Second',
+              onTap: () => debugPrint('SECOND CHILD'),
+            ),
+            SpeedDialChild(
+              child: !rmicons ? const Icon(Icons.margin) : null,
+              backgroundColor: Colors.indigo,
+              foregroundColor: Colors.white,
+              label: 'Show Snackbar',
+              visible: true,
+              onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text(("Third Child Pressed")))),
+              onLongPress: () => debugPrint('THIRD CHILD LONG PRESS'),
+            ),
+          ],
+        ),
+        bottomNavigationBar: BottomAppBar(
+          shape: const CircularNotchedRectangle(),
+          notchMargin: 8.0,
+          child: Row(
+            mainAxisAlignment: selectedfABLocation ==
+                FloatingActionButtonLocation.startDocked
+                ? MainAxisAlignment.end
+                : selectedfABLocation == FloatingActionButtonLocation.endDocked
+                ? MainAxisAlignment.start
+                : MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              ValueListenableBuilder<bool>(
+                  valueListenable: isDialOpen,
+                  builder: (ctx, value, _) => IconButton(
+                    icon: const Icon(Icons.open_in_browser),
+                    tooltip: (!value ? "Open" : "Close") + (" Speed Dial"),
+                    onPressed: () => {isDialOpen.value = !isDialOpen.value},
+                  ))
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+extension EnumExt on FloatingActionButtonLocation {
+  /// Get Value of The SpeedDialDirection Enum like Up, Down, etc. in String format
+  String get value => toString().split(".")[1];
+}
+
+final FlutterSpeedDialCode = {
+  '''
+  """""""" Start """""""""
+  class FlutterSpeedDial extends StatefulWidget {
+  // final ValueNotifier<ThemeMode> theme;
+  const FlutterSpeedDial({Key? key,}) : super(key: key);
+  @override
+  _FlutterSpeedDialState createState() => _FlutterSpeedDialState();
+}
+
+class _FlutterSpeedDialState extends State<FlutterSpeedDial> with TickerProviderStateMixin {
+  var renderOverlay = true;
+  var visible = true;
+  var switchLabelPosition = false;
+  var extend = false;
+  var mini = false;
+  var rmicons = false;
+  var customDialRoot = false;
+  var closeManually = false;
+  var useRAnimation = true;
+  var isDialOpen = ValueNotifier<bool>(false);
+  var speedDialDirection = SpeedDialDirection.up;
+  var buttonSize = const Size(56.0, 56.0);
+  var childrenButtonSize = const Size(56.0, 56.0);
+  var selectedfABLocation = FloatingActionButtonLocation.endDocked;
+  var items = [
+    FloatingActionButtonLocation.startFloat,
+    FloatingActionButtonLocation.startDocked,
+    FloatingActionButtonLocation.centerFloat,
+    FloatingActionButtonLocation.endFloat,
+    FloatingActionButtonLocation.endDocked,
+    FloatingActionButtonLocation.startTop,
+    FloatingActionButtonLocation.centerTop,
+    FloatingActionButtonLocation.endTop,
+  ];
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        if (isDialOpen.value) {
+          isDialOpen.value = false;
+          return false;
+        }
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Flutter Speed Dial Example"),
+        ),
+        body: Center(child: Text("Flutter speed dial example")),
+        floatingActionButtonLocation: selectedfABLocation,
+        floatingActionButton: SpeedDial(
+          // animatedIcon: AnimatedIcons.menu_close,
+          // animatedIconTheme: IconThemeData(size: 22.0),
+          // / This is ignored if animatedIcon is non null
+          // child: Text("open"),
+          // activeChild: Text("close"),
+          icon: Icons.add,
+          activeIcon: Icons.close,
+          spacing: 3,
+          mini: mini,
+          openCloseDial: isDialOpen,
+          childPadding: const EdgeInsets.all(5),
+          spaceBetweenChildren: 4,
+          dialRoot: customDialRoot
+              ? (ctx, open, toggleChildren) {
+            return ElevatedButton(
+              onPressed: toggleChildren,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue[900],
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 22, vertical: 18),
+              ),
+              child: const Text(
+                "Custom Dial Root",
+                style: TextStyle(fontSize: 17),
+              ),
+            );
+          }
+              : null,
+          buttonSize:
+          buttonSize, // it's the SpeedDial size which defaults to 56 itself
+          // iconTheme: IconThemeData(size: 22),
+          label: extend
+              ? const Text("Open")
+              : null, // The label of the main button.
+          /// The active label of the main button, Defaults to label if not specified.
+          activeLabel: extend ? const Text("Close") : null,
+
+          /// Transition Builder between label and activeLabel, defaults to FadeTransition.
+          // labelTransitionBuilder: (widget, animation) => ScaleTransition(scale: animation,child: widget),
+          /// The below button size defaults to 56 itself, its the SpeedDial childrens size
+          childrenButtonSize: childrenButtonSize,
+          visible: visible,
+          direction: speedDialDirection,
+          switchLabelPosition: switchLabelPosition,
+
+          /// If true user is forced to close dial manually
+          closeManually: closeManually,
+
+          /// If false, backgroundOverlay will not be rendered.
+          renderOverlay: renderOverlay,
+          // overlayColor: Colors.black,
+          // overlayOpacity: 0.5,
+          onOpen: () => debugPrint('OPENING DIAL'),
+          onClose: () => debugPrint('DIAL CLOSED'),
+          useRotationAnimation: useRAnimation,
+          tooltip: 'Open Speed Dial',
+          heroTag: 'speed-dial-hero-tag',
+          // foregroundColor: Colors.black,
+          // backgroundColor: Colors.white,
+          // activeForegroundColor: Colors.red,
+          // activeBackgroundColor: Colors.blue,
+          elevation: 8.0,
+          animationCurve: Curves.elasticInOut,
+          isOpenOnStart: false,
+          shape: customDialRoot
+              ? const RoundedRectangleBorder()
+              : const StadiumBorder(),
+          // childMargin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          children: [
+            SpeedDialChild(
+              child: !rmicons ? const Icon(Icons.accessibility) : null,
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              label: 'First',
+              onTap: () => setState(() => rmicons = !rmicons),
+              onLongPress: () => debugPrint('FIRST CHILD LONG PRESS'),
+            ),
+            SpeedDialChild(
+              child: !rmicons ? const Icon(Icons.brush) : null,
+              backgroundColor: Colors.deepOrange,
+              foregroundColor: Colors.white,
+              label: 'Second',
+              onTap: () => debugPrint('SECOND CHILD'),
+            ),
+            SpeedDialChild(
+              child: !rmicons ? const Icon(Icons.margin) : null,
+              backgroundColor: Colors.indigo,
+              foregroundColor: Colors.white,
+              label: 'Show Snackbar',
+              visible: true,
+              onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text(("Third Child Pressed")))),
+              onLongPress: () => debugPrint('THIRD CHILD LONG PRESS'),
+            ),
+          ],
+        ),
+        bottomNavigationBar: BottomAppBar(
+          shape: const CircularNotchedRectangle(),
+          notchMargin: 8.0,
+          child: Row(
+            mainAxisAlignment: selectedfABLocation ==
+                FloatingActionButtonLocation.startDocked
+                ? MainAxisAlignment.end
+                : selectedfABLocation == FloatingActionButtonLocation.endDocked
+                ? MainAxisAlignment.start
+                : MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              ValueListenableBuilder<bool>(
+                  valueListenable: isDialOpen,
+                  builder: (ctx, value, _) => IconButton(
+                    icon: const Icon(Icons.open_in_browser),
+                    tooltip: (!value ? "Open" : "Close") + (" Speed Dial"),
+                    onPressed: () => {isDialOpen.value = !isDialOpen.value},
+                  ))
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+extension EnumExt on FloatingActionButtonLocation {
+  /// Get Value of The SpeedDialDirection Enum like Up, Down, etc. in String format
+  String get value => toString().split(".")[1];
+}
+
+  """""""" End """""""""
+  
+  '''
+
+};
+
+
+///
+///
+///
+///
+class ExpansionTileClass2 extends StatelessWidget {
+  final GlobalKey<ExpansionTileCardState> cardA = GlobalKey();
+
+  final GlobalKey<ExpansionTileCardState> cardB = GlobalKey();
+
+  @override
+  Widget build(BuildContext context) {
+    final ButtonStyle flatButtonStyle = TextButton.styleFrom(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(4.0)),
+      ),
+    );
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("ExpansionTile"),
+      ),
+      body: ListView(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: ExpansionTileCard(
+              key: cardA,
+              leading: const CircleAvatar(child: Text('A')),
+              title: const Text('Tap me!'),
+              subtitle: const Text('I expand!'),
+              children: <Widget>[
+                const Divider(
+                  thickness: 1.0,
+                  height: 1.0,
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 8.0,
+                    ),
+                    child: Text(
+                      """Hi there, I'm a drop-in replacement for Flutter's ExpansionTile.
+
+Use me any time you think your app could benefit from being just a bit more Material.
+
+These buttons control the next card down!""",
+                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 16),
+                    ),
+                  ),
+                ),
+                ButtonBar(
+                  alignment: MainAxisAlignment.spaceAround,
+                  buttonHeight: 52.0,
+                  buttonMinWidth: 90.0,
+                  children: <Widget>[
+                    TextButton(
+                      style: flatButtonStyle,
+                      onPressed: () {
+                        cardB.currentState?.expand();
+                      },
+                      child: const Column(
+                        children: <Widget>[
+                          Icon(Icons.arrow_downward),
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 2.0),
+                          ),
+                          Text('Open'),
+                        ],
+                      ),
+                    ),
+                    TextButton(
+                      style: flatButtonStyle,
+                      onPressed: () {
+                        cardB.currentState?.collapse();
+                      },
+                      child: const Column(
+                        children: <Widget>[
+                          Icon(Icons.arrow_upward),
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 2.0),
+                          ),
+                          Text('Close'),
+                        ],
+                      ),
+                    ),
+                    TextButton(
+                      style: flatButtonStyle,
+                      onPressed: () {
+                        cardB.currentState?.toggleExpansion();
+                      },
+                      child: const Column(
+                        children: <Widget>[
+                          Icon(Icons.swap_vert),
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 2.0),
+                          ),
+                          Text('Toggle'),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: ExpansionTileCard(
+              key: cardB,
+              expandedTextColor: Colors.red,
+              leading: const CircleAvatar(child: Text('B')),
+              title: const Text('Tap me!'),
+              subtitle: const Text('I expand, too!'),
+              children: <Widget>[
+                const Divider(
+                  thickness: 1.0,
+                  height: 1.0,
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 8.0,
+                    ),
+                    child: Text(
+                      """Hi there, I'm a drop-in replacement for Flutter's ExpansionTile.
+
+Use me any time you think your app could benefit from being just a bit more Material.
+
+These buttons control the card above!""",
+                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 16),
+                    ),
+                  ),
+                ),
+                ButtonBar(
+                  alignment: MainAxisAlignment.spaceAround,
+                  buttonHeight: 52.0,
+                  buttonMinWidth: 90.0,
+                  children: <Widget>[
+                    TextButton(
+                      style: flatButtonStyle,
+                      onPressed: () {
+                        cardA.currentState?.expand();
+                      },
+                      child: const Column(
+                        children: <Widget>[
+                          Icon(Icons.arrow_downward),
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 2.0),
+                          ),
+                          Text('Open'),
+                        ],
+                      ),
+                    ),
+                    TextButton(
+                      style: flatButtonStyle,
+                      onPressed: () {
+                        cardA.currentState?.collapse();
+                      },
+                      child: const Column(
+                        children: <Widget>[
+                          Icon(Icons.arrow_upward),
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 2.0),
+                          ),
+                          Text('Close'),
+                        ],
+                      ),
+                    ),
+                    TextButton(
+                      style: flatButtonStyle,
+                      onPressed: () {
+                        cardA.currentState?.toggleExpansion();
+                      },
+                      child: const Column(
+                        children: <Widget>[
+                          Icon(Icons.swap_vert),
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 2.0),
+                          ),
+                          Text('Toggle'),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+final ExpansionTileCode = {
+  '''
+  """""" Start """""
+  class ExpansionTile extends StatelessWidget {
+
+
+  final GlobalKey<ExpansionTileCardState> cardA = GlobalKey();
+
+  final GlobalKey<ExpansionTileCardState> cardB = GlobalKey();
+
+  @override
+  Widget build(BuildContext context) {
+    final ButtonStyle flatButtonStyle = TextButton.styleFrom(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(4.0)),
+      ),
+    );
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("ExpansionTile"),
+      ),
+      body: ListView(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: ExpansionTileCard(
+              key: cardA,
+              leading: const CircleAvatar(child: Text('A')),
+              title: const Text('Tap me!'),
+              subtitle: const Text('I expand!'),
+              children: <Widget>[
+                const Divider(
+                  thickness: 1.0,
+                  height: 1.0,
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 8.0,
+                    ),
+                    child: Text(
+                      """Hi there, I'm a drop-in replacement for Flutter's ExpansionTile.
+
+Use me any time you think your app could benefit from being just a bit more Material.
+
+These buttons control the next card down!""",
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium!
+                          .copyWith(fontSize: 16),
+                    ),
+                  ),
+                ),
+                ButtonBar(
+                  alignment: MainAxisAlignment.spaceAround,
+                  buttonHeight: 52.0,
+                  buttonMinWidth: 90.0,
+                  children: <Widget>[
+                    TextButton(
+                      style: flatButtonStyle,
+                      onPressed: () {
+                        cardB.currentState?.expand();
+                      },
+                      child: const Column(
+                        children: <Widget>[
+                          Icon(Icons.arrow_downward),
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 2.0),
+                          ),
+                          Text('Open'),
+                        ],
+                      ),
+                    ),
+                    TextButton(
+                      style: flatButtonStyle,
+                      onPressed: () {
+                        cardB.currentState?.collapse();
+                      },
+                      child: const Column(
+                        children: <Widget>[
+                          Icon(Icons.arrow_upward),
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 2.0),
+                          ),
+                          Text('Close'),
+                        ],
+                      ),
+                    ),
+                    TextButton(
+                      style: flatButtonStyle,
+                      onPressed: () {
+                        cardB.currentState?.toggleExpansion();
+                      },
+                      child: const Column(
+                        children: <Widget>[
+                          Icon(Icons.swap_vert),
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 2.0),
+                          ),
+                          Text('Toggle'),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: ExpansionTileCard(
+              key: cardB,
+              expandedTextColor: Colors.red,
+              leading: const CircleAvatar(child: Text('B')),
+              title: const Text('Tap me!'),
+              subtitle: const Text('I expand, too!'),
+              children: <Widget>[
+                const Divider(
+                  thickness: 1.0,
+                  height: 1.0,
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 8.0,
+                    ),
+                    child: Text(
+                      """Hi there, I'm a drop-in replacement for Flutter's ExpansionTile.
+
+Use me any time you think your app could benefit from being just a bit more Material.
+
+These buttons control the card above!""",
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium!
+                          .copyWith(fontSize: 16),
+                    ),
+                  ),
+                ),
+                ButtonBar(
+                  alignment: MainAxisAlignment.spaceAround,
+                  buttonHeight: 52.0,
+                  buttonMinWidth: 90.0,
+                  children: <Widget>[
+                    TextButton(
+                      style: flatButtonStyle,
+                      onPressed: () {
+                        cardA.currentState?.expand();
+                      },
+                      child: const Column(
+                        children: <Widget>[
+                          Icon(Icons.arrow_downward),
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 2.0),
+                          ),
+                          Text('Open'),
+                        ],
+                      ),
+                    ),
+                    TextButton(
+                      style: flatButtonStyle,
+                      onPressed: () {
+                        cardA.currentState?.collapse();
+                      },
+                      child: const Column(
+                        children: <Widget>[
+                          Icon(Icons.arrow_upward),
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 2.0),
+                          ),
+                          Text('Close'),
+                        ],
+                      ),
+                    ),
+                    TextButton(
+                      style: flatButtonStyle,
+                      onPressed: () {
+                        cardA.currentState?.toggleExpansion();
+                      },
+                      child: const Column(
+                        children: <Widget>[
+                          Icon(Icons.swap_vert),
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 2.0),
+                          ),
+                          Text('Toggle'),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+  """""" End """""
+  '''
+};
+
+class FancyHiddenDrawer extends StatelessWidget {
+  const FancyHiddenDrawer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SimpleHiddenDrawer(
+        menu: const HiddenDrawer(),
+        screenSelectedBuilder: (position, controller) {
+          return Scaffold(
+              backgroundColor: Colors.white,
+              appBar: AppBar(
+                leading: IconButton(
+                    icon: const Icon(Icons.menu),
+                    onPressed: () {
+                      controller.toggle();
+                    }),
+              ),
+              body: Center(
+                child: Text("Tap the menu icon"),
+              ));
+        },
+      ),
+    );
+  }
+}
+
+class HiddenDrawer extends StatefulWidget {
+  const HiddenDrawer({super.key});
+
+  @override
+  State<HiddenDrawer> createState() => _HiddenDrawerState();
+}
+
+class _HiddenDrawerState extends State<HiddenDrawer> {
+  late SimpleHiddenDrawerController controller;
+
+  @override
+  void didChangeDependencies() {
+    controller = SimpleHiddenDrawerController.of(context);
+    super.didChangeDependencies();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.maxFinite,
+      height: double.maxFinite,
+      color: Colors.cyan,
+      padding: const EdgeInsets.all(8.0),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            ElevatedButton(
+              onPressed: () {
+                controller.setSelectedMenuPosition(0);
+              },
+              child: Text("Menu 1"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                controller.setSelectedMenuPosition(1);
+              },
+              child: Text("Menu 2"),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+final FancyHiddenDrawerCode = {
+  '''
+  """""""" Start """""""""
+  
+class HiddenDrawer extends StatefulWidget {
+  const HiddenDrawer({super.key});
+
+  @override
+  State<HiddenDrawer> createState() => _HiddenDrawerState();
+}
+
+class _HiddenDrawerState extends State<HiddenDrawer> {
+  late SimpleHiddenDrawerController controller;
+
+  @override
+  void didChangeDependencies() {
+    controller = SimpleHiddenDrawerController.of(context);
+    super.didChangeDependencies();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.maxFinite,
+      height: double.maxFinite,
+      color: Colors.cyan,
+      padding: const EdgeInsets.all(8.0),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            ElevatedButton(
+              onPressed: () {
+                controller.setSelectedMenuPosition(0);
+              },
+              child: Text("Menu 1"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                controller.setSelectedMenuPosition(1);
+              },
+              child: Text("Menu 2"),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+  """""""" End """""""""
+  '''
+};
+
+// class FancyHiddenDrawer extends StatefulWidget {
+//   FancyHiddenDrawer({required Key key}) : super(key: key);
+//
+//   @override
+//   _FancyHiddenDrawerState createState() => _FancyHiddenDrawerState();
+// }
+//
+// class _FancyHiddenDrawerState extends State<FancyHiddenDrawer> {
+//   List<ScreenHiddenDrawer> itens = List();
+//
+//   @override
+//   void initState() {
+//     itens.add(new ScreenHiddenDrawer(
+//         new ItemHiddenMenu(
+//           name: "Screen 1",
+//           baseStyle: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 28.0),
+//           colorLineSelected: Colors.teal,
+//         ),
+//         FirstSreen()));
+//
+//     itens.add(new ScreenHiddenDrawer(
+//         new ItemHiddenMenu(
+//           name: "Screen 2",
+//           baseStyle: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 28.0),
+//           colorLineSelected: Colors.orange,
+//         ),
+//         SecondSreen()));
+//
+//     super.initState();
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return HiddenDrawerMenu(
+//       backgroundColorMenu: Colors.blueGrey,
+//       backgroundColorAppBar: Colors.cyan,
+//       screens: itens,
+//       //    typeOpen: TypeOpen.FROM_RIGHT,
+//       //    disableAppBarDefault: false,
+//       //    enableScaleAnimin: true,
+//       //    enableCornerAnimin: true,
+//       //    slidePercent: 80.0,
+//       //    verticalScalePercent: 80.0,
+//       //    contentCornerRadius: 10.0,
+//       //    iconMenuAppBar: Icon(Icons.menu),
+//       //    backgroundContent: DecorationImage((image: ExactAssetImage('assets/bg_news.jpg'),fit: BoxFit.cover),
+//       //    whithAutoTittleName: true,
+//       //    styleAutoTittleName: TextStyle(color: Colors.red),
+//       //    actionsAppBar: <Widget>[],
+//       //    backgroundColorContent: Colors.blue,
+//       //    elevationAppBar: 4.0,
+//       //    tittleAppBar: Center(child: Icon(Icons.ac_unit),),
+//       //    enableShadowItensMenu: true,
+//       //    backgroundMenu: DecorationImage(image: ExactAssetImage('assets/bg_news.jpg'),fit: BoxFit.cover),
+//     );
+//   }
+// }
+
+class LiquidPullRefresh extends StatefulWidget {
+  const LiquidPullRefresh({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  _LiquidPullRefreshState createState() => _LiquidPullRefreshState();
+}
+
+class _LiquidPullRefreshState extends State<LiquidPullRefresh> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<LiquidPullToRefreshState> _refreshIndicatorKey = GlobalKey<LiquidPullToRefreshState>();
+
+  static int refreshNum = 10; // number that changes when refreshed
+  Stream<int> counterStream = Stream<int>.periodic(const Duration(seconds: 3), (x) => refreshNum);
+
+  ScrollController? _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
+
+  static final List<String> _items = <String>['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N'];
+
+  Future<void> _handleRefresh() {
+    final Completer<void> completer = Completer<void>();
+    Timer(const Duration(seconds: 3), () {
+      completer.complete();
+    });
+    setState(() {
+      refreshNum = Random().nextInt(100);
+    });
+    return completer.future.then<void>((_) {
+      ScaffoldMessenger.of(_scaffoldKey.currentState!.context).showSnackBar(
+        SnackBar(
+          content: const Text('Refresh complete'),
+          action: SnackBarAction(
+            label: 'RETRY',
+            onPressed: () {
+              _refreshIndicatorKey.currentState!.show();
+            },
+          ),
+        ),
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: _scaffoldKey,
+      appBar: AppBar(
+        title: const Stack(
+          children: <Widget>[
+            Align(
+              alignment: Alignment(-1.0, 0.0),
+              child: Icon(Icons.reorder),
+            ),
+            Align(
+              alignment: Alignment(-0.3, 0.0),
+              child: Text('Liquid Pull Refresh'),
+            ),
+          ],
+        ),
+      ),
+      body: LiquidPullToRefresh(
+        key: _refreshIndicatorKey,
+        onRefresh: _handleRefresh,
+        showChildOpacityTransition: false,
+        child: StreamBuilder<int>(
+          stream: counterStream,
+          builder: (context, snapshot) {
+            return ListView.builder(
+              padding: kMaterialListPadding,
+              itemCount: _items.length,
+              controller: _scrollController,
+              itemBuilder: (BuildContext context, int index) {
+                final String item = _items[index];
+                return ListTile(
+                  isThreeLine: true,
+                  leading: CircleAvatar(child: Text(item)),
+                  title: Text('This item represents $item.'),
+                  subtitle: Text('Even more additional list item information appears on line three. ${snapshot.data}'),
+                );
+              },
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+final liquidPullRefreshCode = {
+  '''
+  """""""""""""""start""""""""""
+  Scaffold(
+      key: _scaffoldKey,
+      appBar: AppBar(
+        title: Stack(
+          children: <Widget>[
+            const Align(
+              alignment: Alignment(-1.0, 0.0),
+              child: Icon(Icons.reorder),
+            ),
+            Align(
+              alignment: const Alignment(-0.3, 0.0),
+              child: Text(widget.title!),
+            ),
+          ],
+        ),
+      ),
+      body: LiquidPullToRefresh(
+        key: _refreshIndicatorKey,
+        onRefresh: _handleRefresh,
+        showChildOpacityTransition: false,
+        child: StreamBuilder<int>(
+          stream: counterStream,
+          builder: (context, snapshot) {
+            return ListView.builder(
+              padding: kMaterialListPadding,
+              itemCount: _items.length,
+              controller: _scrollController,
+              itemBuilder: (BuildContext context, int index) {
+                final String item = _items[index];
+                return ListTile(
+                  isThreeLine: true,
+                  leading: CircleAvatar(child: Text(item)),
+                  title: Text('This item represents  %item.'),
+                  subtitle: Text(
+                      'Even more additional list item information appears on line three. {snapshot.data}}'),
+                );
+              },
+            );
+          },
+        ),
+      ),
+    ); 
+    """"""""""End"""""""""
+  '''
+};
 
 class IconClass extends StatelessWidget {
   const IconClass({Key? key}) : super(key: key);
@@ -17,6 +1122,7 @@ class IconClass extends StatelessWidget {
     );
   }
 }
+
 final iconCode = {
   ''' Start =>  import 'package:flutter/material.dart';  
   
@@ -51,7 +1157,6 @@ class _MyIconPageState extends State<MyIconPage> {
 } <= End '''
 };
 
-
 class TextClass extends StatelessWidget {
   const TextClass({Key? key}) : super(key: key);
   @override
@@ -59,6 +1164,7 @@ class TextClass extends StatelessWidget {
     return const Center(child: Text("Here are texts"));
   }
 }
+
 final textClassCode = {
   ''' Start =>  import 'package:flutter/material.dart';  
   
@@ -88,7 +1194,6 @@ class _MyIconPageState extends State<MyIconPage> {
 } <= End '''
 };
 
-
 class TypographyClass extends StatelessWidget {
   const TypographyClass({Key? key}) : super(key: key);
 
@@ -96,22 +1201,28 @@ class TypographyClass extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final styles = <String, TextStyle>{
-      'headline 1' : textTheme.displayLarge!,
-      'headline 2' : textTheme.displayMedium!,
-      'headline 3' : textTheme.displaySmall!,
-      'headline 4' : textTheme.headlineMedium!,
-      'headline 5' : textTheme.headlineSmall!,
-      'headline 6' : textTheme.titleLarge!,
+      'headline 1': textTheme.displayLarge!,
+      'headline 2': textTheme.displayMedium!,
+      'headline 3': textTheme.displaySmall!,
+      'headline 4': textTheme.headlineMedium!,
+      'headline 5': textTheme.headlineSmall!,
+      'headline 6': textTheme.titleLarge!,
     };
 
     return ListView(
       children: [
-        for(final i in styles.entries)
-          ListTile(title: Text(i.key, style: i.value,),),
+        for (final i in styles.entries)
+          ListTile(
+            title: Text(
+              i.key,
+              style: i.value,
+            ),
+          ),
       ],
     );
   }
 }
+
 final typographyCode = {
   '''
 
@@ -145,13 +1256,13 @@ class MyApp extends StatelessWidget {
 '''
 };
 
-
 class TextFieldClass extends StatefulWidget {
   const TextFieldClass({Key? key}) : super(key: key);
 
   @override
   State<TextFieldClass> createState() => _TextFieldClassState();
 }
+
 class _TextFieldClassState extends State<TextFieldClass> {
   bool showPass = true;
   @override
@@ -161,10 +1272,7 @@ class _TextFieldClassState extends State<TextFieldClass> {
       child: ListView(
         children: [
           const TextField(
-            decoration: InputDecoration(
-                labelText: "User name",
-                hintText: "Enter username"
-            ),
+            decoration: InputDecoration(labelText: "User name", hintText: "Enter username"),
           ),
           const TextField(
             decoration: InputDecoration(
@@ -179,13 +1287,16 @@ class _TextFieldClassState extends State<TextFieldClass> {
             decoration: InputDecoration(
               labelText: "Password",
               hintText: "Enter password",
-              suffixIcon: IconButton(onPressed: (){
-                setState(() {
-                  showPass =!showPass;
-                });
-              }, icon:  Icon(
-                Icons.remove_red_eye, color: showPass ? Colors.black38 : Colors.blue,
-              )),
+              suffixIcon: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      showPass = !showPass;
+                    });
+                  },
+                  icon: Icon(
+                    Icons.remove_red_eye,
+                    color: showPass ? Colors.black38 : Colors.blue,
+                  )),
             ),
           ),
         ],
@@ -193,6 +1304,7 @@ class _TextFieldClassState extends State<TextFieldClass> {
     );
   }
 }
+
 final textFieldClassCode = {
   ''' Start =>  import 'package:flutter/material.dart';  
   
@@ -249,17 +1361,16 @@ class _TextFieldClassState extends State<TextFieldClass> {
  <= End '''
 };
 
-
 class TextFormFieldExample extends StatefulWidget {
-  const TextFormFieldExample({super.key,});
-
-
+  const TextFormFieldExample({
+    super.key,
+  });
 
   @override
   State<StatefulWidget> createState() => _TextFormFieldExampleState();
 }
-class _TextFormFieldExampleState extends State<TextFormFieldExample> {
 
+class _TextFormFieldExampleState extends State<TextFormFieldExample> {
   bool _obscureText = true;
 
   @override
@@ -354,6 +1465,7 @@ class _TextFormFieldExampleState extends State<TextFormFieldExample> {
     );
   }
 }
+
 final textFormFieldClassCode = {
   ''' Start =>  import 'package:flutter/material.dart';  
   
@@ -467,7 +1579,6 @@ class _TextFormFieldExampleState extends State<TextFormFieldExample> {
  <= End '''
 };
 
-
 class ImageClass extends StatelessWidget {
   const ImageClass({Key? key}) : super(key: key);
 
@@ -483,16 +1594,23 @@ class ImageClass extends StatelessWidget {
               children: const [
                 Image(image: AssetImage("assets/images/basic.png"), width: 120),
                 Spacer(),
-                Text("Images from Assets", style: TextStyle(fontSize: 18,),),
+                Text(
+                  "Images from Assets",
+                  style: TextStyle(
+                    fontSize: 18,
+                  ),
+                ),
               ],
             ),
-            const SizedBox(height: 20,),
+            const SizedBox(
+              height: 20,
+            ),
             const Divider(),
             const ListTile(title: Text('Cached network image:')),
             CachedNetworkImage(
-              imageUrl: 'https://images.pexels.com/photos/3201768/pexels-photo-3201768.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-              placeholder: (context, url) =>
-              const Center(child: CircularProgressIndicator()),
+              imageUrl:
+                  'https://images.pexels.com/photos/3201768/pexels-photo-3201768.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+              placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
               errorWidget: (context, url, error) => const Icon(Icons.error),
             ),
             const Divider(),
@@ -515,6 +1633,7 @@ class ImageClass extends StatelessWidget {
     );
   }
 }
+
 final imageClassCode = {
   ''' Start =>  import 'package:flutter/material.dart';  
   
@@ -580,13 +1699,13 @@ class ImageClass extends StatelessWidget {
  <= End '''
 };
 
-
 class CardInkwellClass extends StatefulWidget {
   const CardInkwellClass({Key? key}) : super(key: key);
 
   @override
   State<CardInkwellClass> createState() => _CardInkwellClassState();
 }
+
 class _CardInkwellClassState extends State<CardInkwellClass> {
   @override
   Widget build(BuildContext context) {
@@ -628,7 +1747,9 @@ class _CardInkwellClassState extends State<CardInkwellClass> {
             child: Center(child: Text('Card 3 (with custom border radius)')),
           ),
         ),
-        const SizedBox(height: 20,),
+        const SizedBox(
+          height: 20,
+        ),
         Card(
           color: Colors.white,
           child: Column(
@@ -652,10 +1773,7 @@ class _CardInkwellClassState extends State<CardInkwellClass> {
                         alignment: Alignment.center,
                         child: Text(
                           'Card 4 (complex example)',
-                          style: Theme.of(context)
-                              .textTheme
-                              .displaySmall!
-                              .copyWith(color: Colors.white),
+                          style: Theme.of(context).textTheme.displaySmall!.copyWith(color: Colors.white),
                         ),
                       ),
                     )
@@ -682,6 +1800,7 @@ class _CardInkwellClassState extends State<CardInkwellClass> {
     );
   }
 }
+
 final cardInkWellCassCode = {
   ''' Start =>  import 'package:flutter/material.dart';  
   
@@ -790,7 +1909,6 @@ class _CardInkwellClassState extends State<CardInkwellClass> {
  <= End '''
 };
 
-
 class GradientClass extends StatelessWidget {
   const GradientClass({Key? key}) : super(key: key);
 
@@ -843,6 +1961,7 @@ class GradientClass extends StatelessWidget {
     );
   }
 }
+
 final gradientClassCode = {
   ''' Start =>  import 'package:flutter/material.dart';  
   
@@ -904,16 +2023,13 @@ class GradientClass extends StatelessWidget {
  <= End '''
 };
 
-
-
-
-
 class DropMenuClass extends StatefulWidget {
   const DropMenuClass({Key? key}) : super(key: key);
 
   @override
   State<DropMenuClass> createState() => _DropMenuClassState();
 }
+
 class _DropMenuClassState extends State<DropMenuClass> {
   static const menuItems = <String>[
     'One',
@@ -923,21 +2039,21 @@ class _DropMenuClassState extends State<DropMenuClass> {
   ];
   final List<DropdownMenuItem<String>> _dropDownMenuItems = menuItems
       .map(
-        (String value) =>
-        DropdownMenuItem<String>(
+        (String value) => DropdownMenuItem<String>(
           value: value,
           child: Text(value),
         ),
-  ).toList();
+      )
+      .toList();
 
   final List<PopupMenuItem<String>> _popUpMenuItems = menuItems
       .map(
-        (String value) =>
-        PopupMenuItem<String>(
+        (String value) => PopupMenuItem<String>(
           value: value,
           child: Text(value),
         ),
-  ).toList();
+      )
+      .toList();
 
   String _btn1SelectedVal = 'One';
   String? _btn2SelectedVal;
@@ -962,7 +2078,9 @@ class _DropMenuClassState extends State<DropMenuClass> {
               items: _dropDownMenuItems,
             ),
           ),
-          const SizedBox(height: 20,),
+          const SizedBox(
+            height: 20,
+          ),
           ListTile(
             title: const Text('DropDownButton with hint:'),
             trailing: DropdownButton(
@@ -976,7 +2094,9 @@ class _DropMenuClassState extends State<DropMenuClass> {
               items: _dropDownMenuItems,
             ),
           ),
-          const SizedBox(height: 20,),
+          const SizedBox(
+            height: 20,
+          ),
           ListTile(
             title: const Text('Popup menu button:'),
             trailing: PopupMenuButton<String>(
@@ -996,6 +2116,7 @@ class _DropMenuClassState extends State<DropMenuClass> {
     );
   }
 }
+
 final dropDownClassCode = {
   ''' Start =>  import 'package:flutter/material.dart';  
   
@@ -1092,13 +2213,13 @@ class _DropMenuClassState extends State<DropMenuClass> {
  <= End '''
 };
 
-
 class ImageFilteredClass extends StatefulWidget {
   const ImageFilteredClass({Key? key}) : super(key: key);
 
   @override
   State<ImageFilteredClass> createState() => _ImageFilteredClassState();
 }
+
 class _ImageFilteredClassState extends State<ImageFilteredClass> {
   double _sigmaX = 0, _sigmaY = 0;
   double _rotZ = 0;
@@ -1120,10 +2241,9 @@ class _ImageFilteredClassState extends State<ImageFilteredClass> {
             imageFilter: ImageFilter.matrix(Matrix4.rotationZ(_rotZ).storage),
             child: const Text(
               'Not only can images be "filtered", in fact any widget '
-                  'can be placed under ImageFiltered!',
+              'can be placed under ImageFiltered!',
             ),
           ),
-
         ],
       ),
     );
@@ -1181,6 +2301,7 @@ class _ImageFilteredClassState extends State<ImageFilteredClass> {
     ];
   }
 }
+
 final imageFilteredClassCode = {
   ''' Start =>  import 'package:flutter/material.dart';  
   
@@ -1274,13 +2395,13 @@ class _ImageFilteredClassState extends State<ImageFilteredClass> {
  <= End '''
 };
 
-
 class OtherStatefulClass extends StatefulWidget {
   const OtherStatefulClass({Key? key}) : super(key: key);
 
   @override
   State<OtherStatefulClass> createState() => _OtherStatefulClassState();
 }
+
 class _OtherStatefulClassState extends State<OtherStatefulClass> {
   bool _switchVal = true;
   bool _checkBoxVal = true;
@@ -1317,7 +2438,7 @@ class _OtherStatefulClassState extends State<OtherStatefulClass> {
         const Divider(),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children:  [
+          children: [
             const Text('Checkbox'),
             Checkbox(
               onChanged: (bool? value) {
@@ -1331,7 +2452,7 @@ class _OtherStatefulClassState extends State<OtherStatefulClass> {
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children:  const [
+          children: const [
             Text('Disabled Checkbox'),
             Checkbox(
               tristate: true,
@@ -1361,27 +2482,33 @@ class _OtherStatefulClassState extends State<OtherStatefulClass> {
         ),
         const Divider(),
         const Text('LinearProgressIndicator'),
-        const SizedBox(height: 5,),
+        const SizedBox(
+          height: 5,
+        ),
         // *When value=null, progress indicators become stateless.*
         const LinearProgressIndicator(),
-        const SizedBox(height: 10,),
+        const SizedBox(
+          height: 10,
+        ),
         const Text('CircularProgressIndicator'),
         const Center(child: CircularProgressIndicator()),
-        const SizedBox(height: 10,),
+        const SizedBox(
+          height: 10,
+        ),
         const Text('Radio'),
         Row(
           children: [0, 1, 2, 3]
               .map(
                 (int index) => Radio<int>(
-              value: index,
-              groupValue: _radioVal,
-              onChanged: (int? value) {
-                if (value != null) {
-                  setState(() => _radioVal = value);
-                }
-              },
-            ),
-          )
+                  value: index,
+                  groupValue: _radioVal,
+                  onChanged: (int? value) {
+                    if (value != null) {
+                      setState(() => _radioVal = value);
+                    }
+                  },
+                ),
+              )
               .toList(),
         ),
         const Divider(),
@@ -1389,6 +2516,7 @@ class _OtherStatefulClassState extends State<OtherStatefulClass> {
     );
   }
 }
+
 final otherStatefulClassCode = {
   ''' Start =>  import 'package:flutter/material.dart';  
   
@@ -1510,5 +2638,3 @@ class _OtherStatefulClassState extends State<OtherStatefulClass> {
 }
  <= End '''
 };
-
-

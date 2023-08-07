@@ -24,7 +24,7 @@ class MainTut {
 List<MainTut> mainList = [
   MainTut(image: "assets/images/basic.png", name: "Basics", subList: basics),
   MainTut(image: "assets/images/advance.png", name: "Advance", subList: advance),
-  MainTut(image: "assets/images/plugins.jpg", name: "plugins", subList: []),
+  MainTut(image: "assets/images/plugins.jpg", name: "Plugins", subList: []),
 ];
 
 class CatalogData {
@@ -65,6 +65,29 @@ class ListOfItems {
   String doc;
   ListOfItems({required this.preview, required this.name, required this.code, this.doc = ""});
 }
+
+final List<ListOfItems> pubDevPluginsList = [
+  ListOfItems(
+      preview: const LiquidPullRefresh(),
+      name: "Fancy Liquid Pull to Refresh",
+      code: liquidPullRefreshCode.toString(),
+      doc: "https://api.flutter.dev/flutter/material/Icons-class.html"),
+  ListOfItems(
+      preview: const FancyHiddenDrawer(),
+      name: "Fancy Hidden drawer",
+      code: FancyHiddenDrawerCode.toString(),
+      doc: "https://api.flutter.dev/flutter/material/Icons-class.html"),
+  ListOfItems(
+      preview: ExpansionTileClass2(),
+      name: "Expandable Tile",
+      code: ExpansionTileCode.toString(),
+      doc: "https://api.flutter.dev/flutter/material/Icons-class.html"),
+  ListOfItems(
+      preview: FlutterSpeedDial(),
+      name: "FlutterSpeedDial",
+      code: FlutterSpeedDialCode.toString(),
+      doc: "https://api.flutter.dev/flutter/material/Icons-class.html"),
+];
 
 final List<ListOfItems> widgetsList = [
   ListOfItems(

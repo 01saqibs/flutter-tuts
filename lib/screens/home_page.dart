@@ -3,6 +3,7 @@ import 'package:flutty_tut/latest_designs/latest_designs.dart';
 import 'package:flutty_tut/lists/data_list.dart';
 import 'package:flutty_tut/screens/catalog_page.dart';
 import 'package:flutty_tut/screens/flutter_ui_page.dart';
+import 'package:flutty_tut/screens/widget_list_page.dart';
 import 'package:flutty_tut/utils/tut_card.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -179,16 +180,23 @@ class _HomePageState extends State<HomePage> {
                 physics: const BouncingScrollPhysics(
                   parent: AlwaysScrollableScrollPhysics(),
                 ),
-                itemBuilder: (context, index) => TutContainer(
-                    title: mainList[index].name,
-                    image: mainList[index].image,
-                    press: () {
-                      Get.to(CatalogPage(
-                        name: mainList[index].name,
-                        list: mainList[index].subList,
-                      ));
-                    },
-                    kCatalogs: mainList[index].subList.length),
+                itemBuilder: (context, index) {
+                  return TutContainer(
+                      title: mainList[index].name,
+                      image: mainList[index].image,
+                      press: () {
+                        mainList[index].name == "Plugins"
+                            ? Get.to(WidgetListPage(
+                                cardItems: pubDevPluginsList,
+                                title: "Pub Dev Plugins",
+                              ))
+                            : Get.to(CatalogPage(
+                                name: mainList[index].name,
+                                list: mainList[index].subList,
+                              ));
+                      },
+                      kCatalogs: mainList[index].subList.length);
+                },
               ),
             )
           ],

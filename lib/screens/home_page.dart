@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutty_tut/latest_designs/latest_designs.dart';
 import 'package:flutty_tut/lists/data_list.dart';
-import 'package:flutty_tut/pages/catalog_page.dart';
-import 'package:flutty_tut/pages/flutter_ui_page.dart';
+import 'package:flutty_tut/screens/catalog_page.dart';
+import 'package:flutty_tut/screens/flutter_ui_page.dart';
 import 'package:flutty_tut/utils/tut_card.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -45,17 +45,14 @@ class _HomePageState extends State<HomePage> {
                   Container(
                     height: 40,
                     width: 40,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            spreadRadius: 3,
-                            blurRadius: 25,
-                            color: Colors.blue.withOpacity(0.5),
-                            offset: const Offset(0, 4),
-                          )
-                        ]),
+                    decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: [
+                      BoxShadow(
+                        spreadRadius: 3,
+                        blurRadius: 25,
+                        color: Colors.blue.withOpacity(0.5),
+                        offset: const Offset(0, 4),
+                      )
+                    ]),
                     child: Builder(builder: (context) {
                       return IconButton(
                         onPressed: () {
@@ -72,10 +69,9 @@ class _HomePageState extends State<HomePage> {
                     width: 80,
                   ),
                   Text(
-                    'Flutty Tut',
+                    'Flutty Tutes',
                     style: GoogleFonts.openSans(
-                      textStyle: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 24),
+                      textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
                     ),
                   )
                 ],
@@ -103,17 +99,13 @@ class _HomePageState extends State<HomePage> {
                     itemBuilder: (context, index) => AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       margin: selectIndex == index
-                          ? const EdgeInsets.symmetric(
-                              vertical: 45, horizontal: 20
-                            )
+                          ? const EdgeInsets.symmetric(vertical: 45, horizontal: 20)
                           : const EdgeInsets.only(
-                              top: 70, bottom: 45,
+                              top: 70,
+                              bottom: 45,
                             ),
                       decoration: BoxDecoration(
-                          border: Border.all(
-                              color: Colors.white,
-                              style: BorderStyle.solid,
-                              width: 2),
+                          border: Border.all(color: Colors.white, style: BorderStyle.solid, width: 2),
                           borderRadius: BorderRadius.circular(20),
                           image: DecorationImage(
                               image: AssetImage(
@@ -141,19 +133,15 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Text("Flutter UI",
                           style: GoogleFonts.openSans(
-                            textStyle: const TextStyle(
-                                fontSize: 22, fontWeight: FontWeight.bold),
+                            textStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                           )),
                       TextButton(
-                        onPressed: (){
+                        onPressed: () {
                           Get.to(const FlutterUIPage());
                         },
                         child: Text("View All",
                             style: GoogleFonts.openSans(
-                              textStyle: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.blue),
+                              textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
                             )),
                       ),
                     ],
@@ -168,8 +156,7 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       ...List.generate(
                         latestDesign.length,
-                        (index) => Indicator(
-                            isActive: selectIndex == index ? true : false),
+                        (index) => Indicator(isActive: selectIndex == index ? true : false),
                       )
                     ],
                   ),
@@ -183,8 +170,7 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.only(left: 20),
               child: Text("Tutorials",
                   style: GoogleFonts.openSans(
-                    textStyle: const TextStyle(
-                        fontSize: 22, fontWeight: FontWeight.bold),
+                    textStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   )),
             ),
             Expanded(

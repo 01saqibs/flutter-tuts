@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
 import 'package:flutty_tut/lists/data_list.dart';
-import 'package:flutty_tut/pages/widget_list_page.dart';
-
+import 'package:flutty_tut/screens/widget_list_page.dart';
 import 'package:flutty_tut/utils/gridview_card.dart';
-
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CatalogPage extends StatefulWidget {
-  const CatalogPage({Key? key, required this.name, required this.list})
-      : super(key: key);
+  const CatalogPage({Key? key, required this.name, required this.list}) : super(key: key);
   final String name;
   final List<CatalogData> list;
 
@@ -34,16 +30,14 @@ class _CatalogPageState extends State<CatalogPage> {
           centerTitle: true,
           title: Text(widget.name,
               style: GoogleFonts.openSans(
-                textStyle: const TextStyle(
-                    color: Colors.black, fontWeight: FontWeight.bold),
+                textStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
               )),
           backgroundColor: Colors.white,
           elevation: 0,
         ),
         body: GridView.builder(
           padding: const EdgeInsets.only(top: 10, bottom: 20),
-          physics: const BouncingScrollPhysics(
-              parent: AlwaysScrollableScrollPhysics()),
+          physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
           itemCount: widget.list.length,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
@@ -65,8 +59,7 @@ class _CatalogPageState extends State<CatalogPage> {
                 name: widget.list[index].name,
                 image: SvgPicture.asset(
                   widget.list[index].svg,
-                  colorFilter:
-                      const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                  colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                 )),
           ),
         ),

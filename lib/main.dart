@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'package:flutty_tut/pages/home_page.dart';
+import 'package:flutty_tut/screens/home_page.dart';
 import 'package:get/get.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     // navigation bar color
     statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.dark,// status bar color
+    statusBarIconBrightness: Brightness.dark, // status bar color
   ));
   runApp(const MyApp());
 }
@@ -27,6 +26,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-
-
